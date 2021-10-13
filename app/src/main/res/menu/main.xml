@@ -8,4 +8,9 @@
         android:title="Item"
         android:visible="true"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/m2"
+        android:icon="@drawable/ic_baseline_edit_24"
+        android:title="Item"
+        app:showAsAction="always" />
 </menu>

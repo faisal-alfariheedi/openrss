@@ -1,12 +1,15 @@
 package com.example.openrss
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var rv: RecyclerView
     lateinit var pos : ArrayList<Entry>
     lateinit var sp: SharedPreferences
-    var apif =client().getClient()?.create(API::class.java)
+    var base = "pics"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -52,35 +55,75 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.m1 -> {
-                CoroutineScope(Dispatchers.IO).launch {
+                refresh()
+                pos.clear()
+                return true
+            }
+            R.id.m2 -> {
+                alert()
 
-                    apif!!.getfeed!!.enqueue(object : Callback<Feed?> {
-                        override fun onResponse(call: Call<Feed?>, response: Response<Feed?>) {
-                    Log.d("feed", "onResponse: feed: " + response.body().toString())
-                    Log.d("response", "onResponse: Server Response: $response")
-                            val entries = response.body()!!.entrys
-                            for (entry in entries!!) {
-                              pos.add(entry)
-                            }
-                            rv.adapter?.notifyDataSetChanged()
-                            saverestore(false)
-                            Toast.makeText(applicationContext, "done refreshing",Toast.LENGTH_SHORT).show()
-                        }
-
-                        override fun onFailure(call: Call<Feed?>, t: Throwable) {
-                            Log.d("failurerere", "$t")
-                            Toast.makeText(
-                                this@MainActivity,
-                                "An Error Occured",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    })
-                }
                 return true
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+    fun refresh() {
+        CoroutineScope(Dispatchers.IO).launch {
+            var apif =client().getClient(base)?.create(API::class.java)
+            apif!!.getfeed!!.enqueue(object : Callback<Feed?> {
+                override fun onResponse(call: Call<Feed?>, response: Response<Feed?>) {
+                    Log.d("feed", "onResponse: feed: " + response.body().toString())
+                    Log.d("response", "onResponse: Server Response: $response")
+                    val entries = response.body()!!.entrys
+                    for (entry in entries!!) {
+                        pos.add(entry)
+                    }
+                    rv.adapter?.notifyDataSetChanged()
+                    saverestore(false)
+                    Toast.makeText(applicationContext, "done refreshing",Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(call: Call<Feed?>, t: Throwable) {
+                    Log.d("failurerere", "$t")
+                    Toast.makeText(
+                        this@MainActivity,
+                        "An Error Occured",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+        }
+    }
+    fun alert(){
+        // first we create a variable to hold an AlertDialog builder
+        val dialogBuilder = AlertDialog.Builder(this)
+        // set input on dialog
+        val input= EditText(this)
+
+
+        // if the dialog is cancelable
+        dialogBuilder.setCancelable(false)
+        // positive button text and action
+
+        dialogBuilder.setPositiveButton("ADD", DialogInterface.OnClickListener {
+                dialog, id ->  base=input.text.toString();pos.clear();refresh();rv.adapter?.notifyDataSetChanged()
+        })
+            // negative button text and action
+            .setNegativeButton("No", DialogInterface.OnClickListener {
+                    dialog, id -> dialog.cancel()
+            })
+
+        // create dialog box
+        val alert = dialogBuilder.create()
+        // set title for alert dialog box
+
+        alert.setTitle("Enter subreddit name")
+
+        alert.setView(input)
+
+        // show alert dialog
+        alert.show()
+
     }
 
 

@@ -4,7 +4,10 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface API {
-    @get:GET("pics/.rss")
+    var link: String
+
+    @get:GET(".rss")
     val getfeed: Call<Feed?>?
+
 
 }

@@ -8,22 +8,22 @@ import java.io.Serializable
 
 @Root(name = "feed",strict = false)
 class Feed constructor() : Serializable {
-    @field:Element(name = "icon")
+    @field:Element(name = "icon",required = false)
     var icon: String? = null
 
-    @field:Element(name = "id")
+    @field:Element(name = "id",required = false)
     var id: String? = null
 
-    @field:Element(name = "logo")
+    @field:Element(name = "logo",required = false)
     var logo: String? = null
 
-    @field:Element(name = "title")
+    @field:Element(name = "title",required = false)
     var title: String? = null
 
-    @field:Element(name = "updated")
+    @field:Element(name = "updated",required = false)
     var updated: String? = null
 
-    @field:Element(name = "subtitle")
+    @field:Element(name = "subtitle",required = false)
     var subtitle: String? = null
 
     @field:ElementList(inline = true, name = "entry")
