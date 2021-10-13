@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">openrss</string>
+    <string name="preference_file_key">com.example.openrss.butbut</string>
+</resources>
